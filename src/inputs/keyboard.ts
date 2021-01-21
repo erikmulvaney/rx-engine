@@ -12,19 +12,19 @@ import {
     withLatestFrom,
 } from 'rxjs/operators';
 
-import { ALL_KEYS } from '../constants/key';
+import { ALL_KEYS, Key, keyLookup } from '../constants/key';
 
 export interface KeyBinding {
   [name: string]: string
 }
 
 interface KeyState {
-    key: string,
+    key: Key,
     state: boolean,
 }
 
 export interface Binding {
-  keys: string[];
+  keys: Key[];
   action: string;
 }
 
@@ -87,10 +87,10 @@ export class Keyboard {
 
   private keyboardInputSetup() {
     const keyTrue$ = fromEvent<KeyboardEvent>(document, KEYDOWN)
-        .pipe<KeyState>(map((event: KeyboardEvent) => ({ key: event.key, state: true })));
+        .pipe<KeyState>(map((event: KeyboardEvent) => ({ key: keyLookup(event.key), state: true })));
 
     const keyFalse$ = fromEvent<KeyboardEvent>(document, KEYUP)
-        .pipe<KeyState>(map((event: KeyboardEvent) => ({ key: event.key, state: false })));
+        .pipe<KeyState>(map((event: KeyboardEvent) => ({ key: keyLookup(event.key), state: false })));
 
     const keyState$ = merge(keyTrue$, keyFalse$);
     return keyState$.pipe(share());
